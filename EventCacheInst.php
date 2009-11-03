@@ -178,9 +178,21 @@ class EventCacheInst {
      * @param <type> $key
      * @return <type>
      */
-    public function delete($key) {
+    public function delete($key, $events = array()) {
         $kKey = $this->cKey('key', $key);
         $this->debug('Del key: %s', $kKey);
+
+        if (empty($events)) {
+            $events = array();
+        }
+
+        // Mother events are attached to all keys
+        if (!empty($this->_config['motherEvents'])) {
+            $events = array_merge($events, (array)$this->_config['motherEvents']);
+        }
+
+        $this->unregister($key, $events);
+
         return $this->_del($kKey);
     }
     /**
