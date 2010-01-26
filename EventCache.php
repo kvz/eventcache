@@ -106,6 +106,10 @@ class EventCache {
     }
 
     static public function magic($scope, $method, $args = array(), $events = array(), $options = array()) {
+        if (empty($args)) $args = array();
+        if (empty($events)) $events = array();
+        if (empty($options)) $options = array();
+
         $key      = self::magicKey($scope, $method, $args, $events, $options);
         $callback = array($scope, '_'.$method);
 
