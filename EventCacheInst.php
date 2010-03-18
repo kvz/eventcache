@@ -45,6 +45,7 @@ class EventCacheInst {
     );
 
     protected $_dir   = null;
+    protected $_localCache  = array();
     public    $Cache = null;
 
     /**
@@ -572,6 +573,12 @@ class EventCacheInst {
      * @return <type>
      */
     protected function _set($cKey, $val, $ttl = 0) {
+        // Set local cache
+        if (@$this->_localCache[$cKey] === $val) {
+            return null;
+        }
+        $this->_localCache[$cKey] = $val;
+
         return $this->Cache->set($cKey, $val, $ttl);
     }
     /**
@@ -581,6 +588,11 @@ class EventCacheInst {
      * @return <type>
      */
     protected function _get($cKey) {
+        // Try local cache first
+        if (isset($this->_localCache[$cKey])) {
+            return $this->_localCache[$cKey];
+        }
+        
         return $this->Cache->get($cKey);
     }
     /**

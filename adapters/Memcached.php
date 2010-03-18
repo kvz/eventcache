@@ -11,7 +11,7 @@ class EventCacheMemcachedAdapter {
 
 		$this->Memcache = new Memcache();
 		foreach ($this->_config['servers'] as $server) {
-			call_user_func_array(array($this->Memcache, 'addServer'), $server);
+			call_user_func(array($this->Memcache, 'addServer'), $server);
 		}
 	}
 

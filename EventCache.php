@@ -114,12 +114,12 @@ class EventCache {
         $callback = array($scope, '_'.$method);
 
         if (!empty($options['disable'])) {
-            return self::_execute($callback, $args);
-        }
-
-        if (false === ($val = self::read($key))) {
             $val = self::_execute($callback, $args);
-            self::write($key, $val, $events, $options);
+        } else {
+            if (false === ($val = self::read($key))) {
+                $val = self::_execute($callback, $args);
+                self::write($key, $val, $events, $options);
+            }
         }
 
         // For testing purposes
@@ -149,4 +149,3 @@ class EventCache {
         return $_this->getLogs();
     }
 }
-?>
