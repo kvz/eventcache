@@ -38,7 +38,7 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
 
         
         $this->EventCacheInst->flush();
-        
+
         $this->EventCacheInst->listAdd('EventCacheLogEntries', 'a', 'Kevin van Zonneveld');
         $this->EventCacheInst->listAdd('EventCacheLogEntries', 'b', 'Kevin');
 
@@ -182,4 +182,3 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(false, $this->EventCacheInst->read('name'));
     }
 }
-?>

@@ -20,7 +20,7 @@ class EventCacheMemcachedAdapter {
 	}
 
 	public function flush() {
-		return @$this->Memcache->flush();
+		return $this->Memcache->flush();
 	}
 
 	public function set($key, $val, $ttl = 0, $flag = 0) {
@@ -43,4 +43,3 @@ class EventCacheMemcachedAdapter {
 		return @$this->Memcache->decrement($key, $value);
 	}
 }
-?>

@@ -44,16 +44,16 @@ class EventCacheInst {
         ),
     );
 
-    protected $_dir   = null;
-    protected $_localCache  = array();
-    public    $Cache = null;
+    protected $_dir        = null;
+    protected $_localCache = array();
+    public    $Cache       = null;
 
     /**
      * Init
      *
      * @param <type> $config
      */
-    public function  __construct($config) {
+    public function  __construct ($config) {
         require_once dirname(__FILE__) . '/adapters/'. 'File.php';
         require_once dirname(__FILE__) . '/adapters/'. 'Memcached.php';
 
@@ -68,7 +68,7 @@ class EventCacheInst {
      * @param <type> $val
      * @return <type>
      */
-    public function setOption($key, $val = null) {
+    public function setOption ($key, $val = null) {
         if (is_array($key) && $val === null) {
             foreach ($key as $k => $v) {
                 if (!$this->setOption($k, $v)) {
@@ -89,7 +89,7 @@ class EventCacheInst {
         return true;
     }
 
-    public function setAdapter($adapter) {
+    public function setAdapter ($adapter) {
         $this->Cache   = new $adapter(array(
             'servers' => $this->_config['servers'],
         ));
@@ -104,7 +104,7 @@ class EventCacheInst {
      * @param <type> $options
      * @return <type>
      */
-    public function write($key, $val, $events = array(), $options = array()) {
+    public function write ($key, $val, $events = array(), $options = array()) {
         if (!empty($this->_config['disable'])) {
             return false;
         }
@@ -136,7 +136,7 @@ class EventCacheInst {
      * @param <type> $key
      * @return <type>
      */
-    public function read($key) {
+    public function read ($key) {
         if (!empty($this->_config['disable'])) {
             return false;
         }
@@ -163,7 +163,7 @@ class EventCacheInst {
      * @param <type> $ttl
      * @return <type>
      */
-    public function listAdd($listKey, $key = null, $val = null, $ttl = 0) {
+    public function listAdd ($listKey, $key = null, $val = null, $ttl = 0) {
         $memKey = $this->cKey('key', $listKey);
         $this->debug('Add item: %s with value: %s to list: %s. ttl: %s',
             $key,
@@ -179,7 +179,7 @@ class EventCacheInst {
      * @param <type> $key
      * @return <type>
      */
-    public function delete($key, $events = array()) {
+    public function delete ($key, $events = array()) {
         $kKey = $this->cKey('key', $key);
         $this->debug('Del key: %s', $kKey);
 
@@ -202,7 +202,7 @@ class EventCacheInst {
      * @param <type> $events
      * @return <type>
      */
-    public function clear($events = null) {
+    public function clear ($events = null) {
         if (!$this->_config['trackEvents']) {
             $this->err('You need to enable the slow "trackEvents" option for this');
             return false;
@@ -229,7 +229,7 @@ class EventCacheInst {
      *
      * @return <type>
      */
-    public function flush() {
+    public function flush () {
         return $this->_flush();
     }
 
@@ -239,7 +239,7 @@ class EventCacheInst {
      * @param <type> $key
      * @param <type> $events
      */
-    public function unregister($key, $events = array()) {
+    public function unregister ($key, $events = array()) {
         return $this->register($key, $events, true);
     }
 
@@ -250,7 +250,7 @@ class EventCacheInst {
      * @param <type> $events
      * @param <type> $del
      */
-    public function register($key, $events = array(), $del = false) {
+    public function register ($key, $events = array(), $del = false) {
         if (empty($events)) {
             return false;
         }
@@ -268,7 +268,7 @@ class EventCacheInst {
             }
         }
 
-        foreach($events as $event) {
+        foreach ($events as $event) {
             $eKey = $this->cKey('event', $event);
             $kKey = $this->cKey('key', $key);
             if ($del) {
@@ -285,13 +285,13 @@ class EventCacheInst {
      *
      * @param <type> $event
      */
-    public function trigger($event) {
+    public function trigger ($event) {
         $cKeys = $this->getCKeys($event);
         return $this->_del($cKeys);
     }
 
     // Get events
-    public function getEvents() {
+    public function getEvents () {
         if (!$this->_config['trackEvents']) {
             $this->err('You need to enable the slow "trackEvents" option for this');
             return false;
@@ -308,7 +308,7 @@ class EventCacheInst {
      * @param <type> $event
      * @return <type>
      */
-    public function getKeys($event) {
+    public function getKeys ($event) {
         $eKey = $this->cKey('event', $event);
         $keys = $this->_get($eKey);
         return $keys ? $keys : array();
@@ -320,7 +320,7 @@ class EventCacheInst {
      * @param <type> $event
      * @return <type>
      */
-    public function getCKeys($event) {
+    public function getCKeys ($event) {
         $list = $this->getKeys($event);
         if (!is_array($list)) {
             return $list;
@@ -336,7 +336,7 @@ class EventCacheInst {
      * @param <type> $key
      * @return <type>
      */
-    public function cKey($type, $key) {
+    public function cKey ($type, $key) {
         // Local cache for cKeys
         static $cKeys;
         if (isset($cKeys[$type.','.$key])) {
@@ -371,7 +371,7 @@ class EventCacheInst {
      * @param <type> $str
      * @return <type>
      */
-    public function sane($str) {
+    public function sane ($str) {
         if (is_array($str)) {
             foreach($str as $k => $v) {
                 $str[$k] = $this->sane($v);
@@ -410,7 +410,7 @@ class EventCacheInst {
      * @param <type> $str
      * @return <type>
      */
-    public function debug($str) {
+    public function debug ($str) {
         $args = func_get_args();
         return self::_log(self::LOG_DEBUG, array_shift($args), $args);
     }
@@ -420,7 +420,7 @@ class EventCacheInst {
      * @param <type> $str
      * @return <type>
      */
-    public function err($str) {
+    public function err ($str) {
         $args = func_get_args();
         return self::_log(self::LOG_ERR, array_shift($args), $args);
     }
@@ -432,7 +432,7 @@ class EventCacheInst {
      * @param <type> $args
      * @return <type>
      */
-    protected function _log($level, $str, $args) {
+    protected function _log ($level, $str, $args) {
         foreach ($args as $k=>$arg) {
             if (is_array($arg)) {
                 $args[$k] = substr(var_export($arg, true), 0, 30);
@@ -456,7 +456,7 @@ class EventCacheInst {
         }
     }
 
-    public function getLogs() {
+    public function getLogs () {
         if (!empty($this->_config['logInKey'])) {
             $keys = $this->getKeys($this->_config['logInKey']);
             foreach ($keys as $cKey=>$key) {
@@ -471,7 +471,7 @@ class EventCacheInst {
         }
     }
 
-    public function out($str) {
+    public function out ($str) {
         echo $str . "\n";
         return true;
     }
@@ -484,7 +484,7 @@ class EventCacheInst {
      * @param <type> $ttl
      * @return <type>
      */
-    protected function _listDel($memKey, $cKey, $ttl = 0) {
+    protected function _listDel ($memKey, $cKey, $ttl = 0) {
         $list = $this->_get($memKey);
         if (is_array($list) && array_key_exists($cKey, $list)) {
             unset($list[$cKey]);
@@ -503,7 +503,7 @@ class EventCacheInst {
      * @param <type> $ttl
      * @return <type>
      */
-    protected function _listAdd($memKey, $cKey = null, $val = null, $ttl = 0) {
+    protected function _listAdd ($memKey, $cKey = null, $val = null, $ttl = 0) {
         if ($val === null) {
             $val = time();
         }
@@ -527,7 +527,7 @@ class EventCacheInst {
      * @param <type> $ttl
      * @return <type>
      */
-    protected function _add($cKey, $val, $ttl = 0) {
+    protected function _add ($cKey, $val, $ttl = 0) {
         return $this->Cache->add($cKey, $val, $ttl);
     }
     /**
@@ -538,7 +538,7 @@ class EventCacheInst {
      *
      * @return <type>
      */
-    protected function _del($cKeys, $ttl = 0) {
+    protected function _del ($cKeys, $ttl = 0) {
         if (empty($cKeys)) {
             return null;
         }
@@ -557,6 +557,7 @@ class EventCacheInst {
             return count($cKeys) - count($errors);
         }
 
+        unset($this->_localCache[$cKeys]);
         if (!$this->Cache->delete($cKeys, $ttl)) {
             #trigger_error('Cant delete '.$cKeys, E_USER_NOTICE);
             return false;
@@ -572,7 +573,7 @@ class EventCacheInst {
      * @param <type> $ttl
      * @return <type>
      */
-    protected function _set($cKey, $val, $ttl = 0) {
+    protected function _set ($cKey, $val, $ttl = 0) {
         // Set local cache
         if (@$this->_localCache[$cKey] === $val) {
             return null;
@@ -587,7 +588,7 @@ class EventCacheInst {
      * @param <type> $cKey
      * @return <type>
      */
-    protected function _get($cKey) {
+    protected function _get ($cKey) {
         // Try local cache first
         if (isset($this->_localCache[$cKey])) {
             return $this->_localCache[$cKey];
@@ -600,8 +601,8 @@ class EventCacheInst {
      *
      * @return <type>
      */
-    protected function _flush() {
+    protected function _flush () {
+        $this->_localCache = array();
         return $this->Cache->flush();
     }
 }
-?>

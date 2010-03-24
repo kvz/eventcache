@@ -68,11 +68,8 @@ class EventCacheFileAdapter {
         return true;
     }
     protected function _delete($key) {
-        if ($key !== '*') {
-            $key = $this->_safekey($key);
-        }
-
-        foreach (glob($this->_config['dir'].'/'.$key.'.cache') as $file) {
+        $path = $this->_keypath($key);
+        foreach (glob($path) as $file) {
             if (!unlink($file)) {
                 return false;
             }
@@ -82,6 +79,9 @@ class EventCacheFileAdapter {
     }
 
     protected function _safekey($key) {
+        if ($key === '*') {
+            return $key;
+        }
         #return sha1($key);
         return $key;
     }
@@ -89,4 +89,3 @@ class EventCacheFileAdapter {
         return $this->_config['dir'].'/'.$this->_safekey($key).'.cache';
     }
 }
-?>
