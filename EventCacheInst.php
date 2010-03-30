@@ -33,6 +33,7 @@ class EventCacheInst {
         'logInKey' => false,
         'logInVar' => false,
         'logHits' => false,
+        'logMicroseconds' => false,
         'logOnScreen' => false,
         'ttl' => 0,
         'flag' => MEMCACHE_COMPRESSED,
@@ -439,9 +440,19 @@ class EventCacheInst {
             }
         }
 
+        if ($this->_config['logMicroseconds']) {
+            // From: http://www.php.net/manual/en/function.date.php#93891
+            $t     = microtime(true);
+            $micro = sprintf("%06d",($t - floor($t)) * 1000000);
+            $d     = new DateTime( date('Y-m-d H:i:s.'.$micro,$t) );
+            $date  = $d->format("Y-m-d H:i:s.u");
+        } else {
+            $date = date('M d H:i:s');
+        }
+        
         $log  = '';
         $log .= '';
-        $log .= '['.date('M d H:i:s').']';
+        $log .= '['.$date.']';
         $log .= ' ';
         $log .= str_pad($this->_logLevels[$level], 8, ' ', STR_PAD_LEFT);
         $log .= ': ';
