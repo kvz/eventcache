@@ -96,7 +96,7 @@ class EventCache {
         return $key;
     }
 
-    static protected function _execute($callback, $args) {
+    static protected function _execute ($callback, $args) {
         // Can we Execute Callback?
         if (!is_callable($callback)) {
             trigger_error('Can\'t call '.join('::', $callback).' is it public?', E_USER_ERROR);
@@ -105,13 +105,15 @@ class EventCache {
         return call_user_func_array($callback, $args);
     }
 
-    static public function magic($scope, $method, $args = array(), $events = array(), $options = array()) {
+    static public function magic ($scope, $method, $args = array(), $events = array(), $options = array()) {
         if (empty($args)) $args = array();
         if (empty($events)) $events = array();
         if (empty($options)) $options = array();
 
         $key      = self::magicKey($scope, $method, $args, $events, $options);
         $callback = array($scope, '_'.$method);
+        #$debug    = $method === '_getLookupList';
+        $debug    = false;
 
         if (!empty($options['disable'])) {
             $val = self::_execute($callback, $args);
@@ -119,6 +121,7 @@ class EventCache {
             if (false === ($val = self::read($key))) {
                 $val = self::_execute($callback, $args);
                 self::write($key, $val, $events, $options);
+                $debug && pr(compact('key', 'method', 'options', 'events', 'val'));
             }
         }
 
