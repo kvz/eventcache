@@ -14,8 +14,6 @@ class EventCacheAdapterApc extends EventCacheAdapter {
             );
         }
 
-        prd(ini_get('apc.shm_size'));
-
         return true;
 	}
     
@@ -23,7 +21,7 @@ class EventCacheAdapterApc extends EventCacheAdapter {
 		return apc_fetch($key);
 	}
 	public function set ($key, $val, $ttl = 999) {
-        apc_store($key, $val, $ttl);
+        return apc_store($key, $val, $ttl);
 
 //        if (($got = apc_fetch($key)) !== $val) {
 //            trigger_error(sprintf(
