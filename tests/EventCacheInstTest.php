@@ -28,31 +28,31 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         $this->EventCacheInst->clear();
     }
 
-    public function testListAdd() {
+    public function testUlistAdd() {
         $this->EventCacheInst->flush();
         
-        $this->EventCacheInst->listAdd('EventCacheLogEntries', null, 'Kevin van Zonneveld');
-        $this->EventCacheInst->listAdd('EventCacheLogEntries', null, 'Kevin');
+        $this->EventCacheInst->ulistAdd('EventCacheLogEntries', null, 'Kevin van Zonneveld');
+        $this->EventCacheInst->ulistAdd('EventCacheLogEntries', null, 'Kevin');
 
-        $list = $this->EventCacheInst->read('EventCacheLogEntries');
+        $ulist = $this->EventCacheInst->read('EventCacheLogEntries');
 
         $this->assertEquals(array(
             'Kevin van Zonneveld',
             'Kevin',
-        ), $list);
+        ), $ulist);
 
         
         $this->EventCacheInst->flush();
 
-        $this->EventCacheInst->listAdd('EventCacheLogEntries', 'a', 'Kevin van Zonneveld');
-        $this->EventCacheInst->listAdd('EventCacheLogEntries', 'b', 'Kevin');
+        $this->EventCacheInst->ulistAdd('EventCacheLogEntries', 'a', 'Kevin van Zonneveld');
+        $this->EventCacheInst->ulistAdd('EventCacheLogEntries', 'b', 'Kevin');
 
-        $list = $this->EventCacheInst->read('EventCacheLogEntries');
+        $ulist = $this->EventCacheInst->read('EventCacheLogEntries');
 
         $this->assertEquals(array(
             'a' => 'Kevin van Zonneveld',
             'b' => 'Kevin',
-        ), $list);
+        ), $ulist);
     }
 
     public function testWrite() {
