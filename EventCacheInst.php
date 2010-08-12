@@ -29,7 +29,7 @@ class EventCacheInst {
     protected $_config = array(
         'app' => 'base',
         'delimiter' => '-',
-        'adapter' => 'EventCacheAdapterMemcached',
+        'adapter' => 'EventCacheAdapterApc',
         'logInKey' => false,
         'logInVar' => false,
         'logHits' => false,
@@ -455,7 +455,7 @@ class EventCacheInst {
      * @return <type>
      */
     protected function _log ($level, $str, $args) {
-        foreach ($args as $k=>$arg) {
+        foreach ($args as $k => $arg) {
             if (is_array($arg)) {
                 $args[$k] = substr(var_export($arg, true), 0, 30);
             }
@@ -480,7 +480,11 @@ class EventCacheInst {
         $log .= vsprintf($str, $args);
 
         if (!empty($this->_config['logInKey'])) {
-            return $this->_listAdd($this->cKey('key', $this->_config['logInKey']), null, $log);
+            return $this->_listAdd(
+                $this->cKey('key', $this->_config['logInKey']),
+                null,
+                $log
+            );
         } elseif (!empty($this->_config['logOnScreen'])) {
             return $this->out($log);
         } elseif (!empty($this->_config['logInVar'])) {
@@ -536,9 +540,6 @@ class EventCacheInst {
      * @return <type>
      */
     protected function _listAdd ($memKey, $cKey = null, $val = null, $ttl = 0) {
-        if ($val === null) {
-            $val = time();
-        }
         $list = $this->_get($memKey);
         if (empty($list)) {
             $list = array();
@@ -570,7 +571,7 @@ class EventCacheInst {
      *
      * @return <type>
      */
-    protected function _del ($cKeys, $ttl = 0) {
+    protected function _del ($cKeys) {
         if (empty($cKeys)) {
             return null;
         }
@@ -590,7 +591,7 @@ class EventCacheInst {
         }
 
         unset($this->_localCache[$cKeys]);
-        if (!$this->Cache->delete($cKeys, $ttl)) {
+        if (!$this->Cache->delete($cKeys)) {
             #trigger_error('Cant delete '.$cKeys, E_USER_NOTICE);
             return false;
         }

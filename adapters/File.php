@@ -21,7 +21,7 @@ class EventCacheAdapterFile extends EventCacheAdapter {
 	public function add ($key, $val, $ttl = 0) {
         return $this->_write($key, $val);
 	}
-	public function delete ($key, $ttl = 0) {
+	public function delete ($key) {
 		return $this->_delete($key);
 	}
 	public function flush () {

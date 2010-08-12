@@ -28,7 +28,7 @@ class EventCacheAdapterMemcached extends EventCacheAdapter {
 	public function add ($key, $val, $ttl = 0) {
 		return @$this->Memcache->add($key, $val, 0, $ttl);
 	}
-	public function delete ($key, $ttl = 0) {
+	public function delete ($key) {
 		return @$this->Memcache->delete($key, $ttl);
 	}
 	public function flush () {
