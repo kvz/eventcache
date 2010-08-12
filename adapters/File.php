@@ -4,49 +4,52 @@
  *
  */
 class EventCacheFileAdapter {
-	public $cache;
-
     protected $_config = array();
 
-	public function __construct($options) {
-		$this->_config =  $options + $this->_config;
-
+	public function __construct ($options) {
+		$this->_config = array_merge($this->_config, $options);
         if (!isset($this->_config['dir'])) $this->_config['dir'] = '/tmp/EventCache';
+	}
+	public function init () {
         if (!is_dir($this->_config['dir']) && !mkdir($this->_config['dir'], 0777, true)) {
-            trigger_error('Unable to find and create directory: '.$this->_config['dir'], E_USER_ERROR);
+            return sprintf(
+                'Unable to find and create EventCache File directory: %s',
+                $this->_config['dir']
+            );
         }
+        return true;
 	}
 
-	public function get($key) {
+	public function get ($key) {
 		return $this->_read($key);
 	}
-	public function flush() {
-        return $this->_delete('*');
-	}
-	public function set($key, $val, $ttl = 0, $flag = 0) {
+	public function set ($key, $val, $ttl = 0, $flag = 0) {
 		return $this->_write($key, $val);
 	}
-
-	public function add($key, $val, $ttl = 0) {
+	public function add ($key, $val, $ttl = 0) {
         return $this->_write($key, $val);
 	}
-	public function delete($key, $ttl = 0) {
+	public function delete ($key, $ttl = 0) {
 		return $this->_delete($key);
 	}
-	public function increment($key, $value = 1) {
+	public function flush () {
+        return $this->_delete('*');
+	}
+
+	public function increment ($key, $value = 1) {
         if (is_numeric(($val = $this->_read($value)))) {
             $value = $val++;
         }
         return $this->_write($key, $value);
 	}
-	public function decrement($key, $value = 1) {
+	public function decrement ($key, $value = 1) {
         if (is_numeric(($val = $this->_read($value)))) {
             $value = $val--;
         }
         return $this->_write($key, $value);
 	}
 
-    protected function _read($key) {
+    protected function _read ($key) {
         $path = $this->_keypath($key);
 
         if (false === ($value = @file_get_contents($path))) {
@@ -56,7 +59,7 @@ class EventCacheFileAdapter {
         $value = unserialize($value);
         return $value;
     }
-    protected function _write($key, $value) {
+    protected function _write ($key, $value) {
         $value = serialize($value);
         $path  = $this->_keypath($key);
 
@@ -67,7 +70,7 @@ class EventCacheFileAdapter {
 
         return true;
     }
-    protected function _delete($key) {
+    protected function _delete ($key) {
         $path = $this->_keypath($key);
         foreach (glob($path) as $file) {
             if (!unlink($file)) {
@@ -78,14 +81,14 @@ class EventCacheFileAdapter {
         return true;
     }
 
-    protected function _safekey($key) {
+    protected function _safekey ($key) {
         if ($key === '*') {
             return $key;
         }
         #return sha1($key);
         return $key;
     }
-    protected function _keypath($key) {
+    protected function _keypath ($key) {
         return $this->_config['dir'].'/'.$this->_safekey($key).'.cache';
     }
 }

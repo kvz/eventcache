@@ -55,6 +55,7 @@ class EventCacheInst {
      * @param <type> $config
      */
     public function  __construct ($config) {
+        require_once dirname(__FILE__) . '/adapters/'. 'Apc.php';
         require_once dirname(__FILE__) . '/adapters/'. 'File.php';
         require_once dirname(__FILE__) . '/adapters/'. 'Memcached.php';
 
@@ -80,7 +81,6 @@ class EventCacheInst {
         }
 
         if ($key === 'adapter' && $this->_config['adapter'] !== $val) {
-            trigger_error('Changing adapter to '.$val);
             $this->setAdapter($val);
         }
 
@@ -91,9 +91,20 @@ class EventCacheInst {
     }
 
     public function setAdapter ($adapter) {
-        $this->Cache   = new $adapter(array(
+        $this->Cache = new $adapter(array(
             'servers' => $this->_config['servers'],
         ));
+
+        if (true !== ($res = $this->Cache->init())) {
+            trigger_error(sprintf(
+                'Unable to use the %s adapter because: ',
+                $adapter,
+                $res
+            ), E_USER_ERROR);
+            return false;
+        }
+
+        return true;
     }
 
     /**
