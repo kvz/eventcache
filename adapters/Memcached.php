@@ -1,14 +1,8 @@
 <?php
-class EventCacheMemcachedAdapter {
-	protected $_config = array(
-		'servers' => null,
-	);
+require_once dirname(__FILE__) . '/Adapter.php';
+class EventCacheAdapterMemcached extends EventCacheAdapter {
+	protected $Memcache;
 
-	public $Memcache;
-
-	public function __construct ($options) {
-		$this->_config = array_merge($this->_config, $options);
-	}
 	public function init () {
         if (!class_exists('Memcache')) {
             return sprintf(
@@ -40,6 +34,7 @@ class EventCacheMemcachedAdapter {
 	public function flush () {
 		return $this->Memcache->flush();
 	}
+
 
 	public function increment ($key, $value = 1) {
 		return @$this->Memcache->increment($key, $value);

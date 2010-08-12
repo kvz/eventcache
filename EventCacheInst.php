@@ -29,7 +29,7 @@ class EventCacheInst {
     protected $_config = array(
         'app' => 'base',
         'delimiter' => '-',
-        'adapter' => 'EventCacheMemcachedAdapter',
+        'adapter' => 'EventCacheAdapterMemcached',
         'logInKey' => false,
         'logInVar' => false,
         'logHits' => false,
@@ -85,7 +85,6 @@ class EventCacheInst {
         }
 
         $this->_config[$key] = $val;
-
 
         return true;
     }
@@ -173,6 +172,7 @@ class EventCacheInst {
      * @param <type> $key
      * @param <type> $val
      * @param <type> $ttl
+     * 
      * @return <type>
      */
     public function listAdd ($listKey, $key = null, $val = null, $ttl = 0) {
@@ -216,28 +216,36 @@ class EventCacheInst {
      */
     public function clear ($events = null) {
         if (!$this->_config['trackEvents']) {
-            $this->err('You need to enable the slow "trackEvents" option for this');
+            $this->err('You need to enable the slower "trackEvents" option for this');
             return false;
         }
 
         if ($events === null) {
             $events = $this->getEvents();
             if (!empty($events)) {
-               $this->clear($events);
+               return $this->clear($events);
             }
-        } else {
-            $events = (array)$events;
-            foreach($events as $eKey=>$event) {
-                $cKeys = $this->getCKeys($event);
-                $this->_del($cKeys);
+            return null;
+        }
 
-                $this->_del($eKey);
-            }
+        $events = (array)$events;
+        $etKey = $this->cKey('events', 'track');
+        foreach ($events as $eKey => $event) {
+            $cKeys = $this->getCKeys($event);
+
+            // Delete Event's keys
+            $this->_del($cKeys);
+
+            // Delete Event
+            $this->_del($eKey);
+
+            // Delete event from tracked
+            $this->_listDel($etKey, $eKey);
         }
     }
 
     /**
-     * Kills everything in (mem) cache. Everything!
+     * Kills everything in (mem) cache. Everything!! 
      *
      * @return <type>
      */
@@ -261,6 +269,8 @@ class EventCacheInst {
      * @param <type> $key
      * @param <type> $events
      * @param <type> $del
+     *
+     * @return boolean
      */
     public function register ($key, $events = array(), $del = false) {
         if (empty($events)) {
@@ -270,7 +280,7 @@ class EventCacheInst {
         if ($this->_config['trackEvents']) {
             // Slows down performance
             $etKey = $this->cKey('events', 'track');
-            foreach($events as $event) {
+            foreach ($events as $event) {
                 $eKey = $this->cKey('event', $event);
                 if ($del) {
                     $this->_listDel($etKey, $eKey);

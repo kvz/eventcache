@@ -1,16 +1,8 @@
 <?php
-/**
- * File adapter to EventCache
- *
- */
-class EventCacheFileAdapter {
-    protected $_config = array();
-
-	public function __construct ($options) {
-		$this->_config = array_merge($this->_config, $options);
-        if (!isset($this->_config['dir'])) $this->_config['dir'] = '/tmp/EventCache';
-	}
+require_once dirname(__FILE__) . '/Adapter.php';
+class EventCacheAdapterFile extends EventCacheAdapter {
 	public function init () {
+        if (!isset($this->_config['dir'])) $this->_config['dir'] = '/tmp/EventCache';
         if (!is_dir($this->_config['dir']) && !mkdir($this->_config['dir'], 0777, true)) {
             return sprintf(
                 'Unable to find and create EventCache File directory: %s',
@@ -36,6 +28,7 @@ class EventCacheFileAdapter {
         return $this->_delete('*');
 	}
 
+
 	public function increment ($key, $value = 1) {
         if (is_numeric(($val = $this->_read($value)))) {
             $value = $val++;
@@ -48,6 +41,7 @@ class EventCacheFileAdapter {
         }
         return $this->_write($key, $value);
 	}
+
 
     protected function _read ($key) {
         $path = $this->_keypath($key);
@@ -63,8 +57,8 @@ class EventCacheFileAdapter {
         $value = serialize($value);
         $path  = $this->_keypath($key);
 
-        if (!file_put_contents($path, $value)) {
-            trigger_error('Unable to write to '.$path, E_USER_WARNING);
+        if (!@file_put_contents($path, $value)) {
+            trigger_error('Unable to write to ' . $path, E_USER_WARNING);
             return false;
         }
 
@@ -89,6 +83,6 @@ class EventCacheFileAdapter {
         return $key;
     }
     protected function _keypath ($key) {
-        return $this->_config['dir'].'/'.$this->_safekey($key).'.cache';
+        return $this->_config['dir'] . '/' . $this->_safekey($key) . '.cache';
     }
 }
