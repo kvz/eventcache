@@ -37,11 +37,11 @@ class EventCacheAdapterFile extends EventCacheAdapter {
         $value = unserialize($value);
         return $value;
     }
-    protected function _write ($key, $value) {
-        $value = serialize($value);
+    protected function _write ($key, $val) {
+        $val = serialize($val);
         $path  = $this->_keypath($key);
 
-        if (!@file_put_contents($path, $value)) {
+        if (!@file_put_contents($path, $val)) {
             trigger_error('Unable to write to ' . $path, E_USER_WARNING);
             return false;
         }

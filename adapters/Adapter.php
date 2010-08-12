@@ -5,7 +5,7 @@ class EventCacheAdapter {
 
     protected $_flushSafe = true;
 
-	public function __construct ($options) {
+	public function __construct ($options = array()) {
 		$this->_config = array_merge($this->_config, $options);
 	}
     public function init () {
@@ -30,14 +30,14 @@ class EventCacheAdapter {
 	}
 
     
-	public function increment ($key, $value = 1) {
-        if ($this->set($key, ($new = (float)$this->get($key) + $value))) {
+	public function increment ($key, $val = 1) {
+        if ($this->set($key, ($new = (float)$this->get($key) + $val))) {
             return $new;
         }
         return false;
 	}
-	public function decrement ($key, $value = 1) {
-		if ($this->set($key, ($new = (float)$this->get($key) - $value))) {
+	public function decrement ($key, $val = 1) {
+		if ($this->set($key, ($new = (float)$this->get($key) - $val))) {
             return $new;
         }
         return false;
@@ -94,9 +94,8 @@ class EventCacheAdapter {
             $list = array();
         }
         $list[] = $val;
-        $success = $this->set($listKey, $list);
-        prd(compact('val', 'listKey', 'list', 'success'));
-        return $y;
+
+        return $this->set($listKey, $list);
     }
     public function getList ($listKey) {
         return $this->get($listKey);

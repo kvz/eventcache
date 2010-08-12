@@ -196,8 +196,8 @@ class EventCacheInst {
     }
     
     public function getList ($listKey) {
-        $safeUlistKey = $this->safeKey('key', $listKey);
-        return $this->_getList($safeUlistKey);
+        $safeListKey = $this->safeKey('key', $listKey);
+        return $this->_getList($safeListKey);
     }
     public function listAdd ($listKey, $item) {
         $safeListKey = $this->safeKey('key', $listKey);

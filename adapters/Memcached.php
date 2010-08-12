@@ -39,10 +39,10 @@ class EventCacheAdapterMemcached extends EventCacheAdapter {
 	}
 
 
-	public function increment ($key, $value = 1) {
-		return @$this->Memcache->increment($key, $value);
+	public function increment ($key, $val = 1) {
+		return @$this->Memcache->increment($key, $val);
 	}
-	public function decrement ($key, $value = 1) {
-		return @$this->Memcache->decrement($key, $value);
+	public function decrement ($key, $val = 1) {
+		return @$this->Memcache->decrement($key, $val);
 	}
 }

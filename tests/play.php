@@ -25,16 +25,28 @@ $E = new EventCacheInst(array(
 ));
 
 #$E->flush();
+//
+//$E->delete('test');
+//$lijst = $E->read('test');
+//if (empty($lijst)) {
+//    $lijst = array();
+//}
+//$lijst[] = 'test';
+//$E->write('test', $lijst);
+//prd($E->read('test'));
+apc_clear_cache('user');
 
-#$E->delete('test');
-#$E->write('test', array('kevin'));
-#prd($E->read('test'));
 
-//$E->delete('lijst');
-//$E->listAdd('lijst', 'kevin');
-//$E->listAdd('lijst', 'jp');
-//$lijst = $E->getList('lijst');
-//prd(compact('lijst'));
+
+$E->delete('b');
+$E->write('b', '1');
+$E->delete('b');
+$E->listAdd('b', 'kevin');
+$E->listAdd('b', 'jp');
+
+
+$lijst = $E->getList('lijst');
+prd(compact('lijst'));
 
 
 $E->ulistSet('ulijst', 'naam1', 'kevin');
