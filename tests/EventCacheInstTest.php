@@ -11,7 +11,7 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
      *
      * @access protected
      */
-    protected function setUp()
+    protected function setUp ()
     {
         $this->EventCacheInst = new EventCacheInst(array(
             'app' => 'testapp',
@@ -23,16 +23,16 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
 
         $this->EventCacheInst->clear();
     }
-    protected function tearDown()
+    protected function tearDown ()
     {
         $this->EventCacheInst->clear();
     }
 
-    public function testUlistAdd() {
+    public function testUlistSet () {
         $this->EventCacheInst->flush();
         
-        $this->EventCacheInst->ulistAdd('EventCacheLogEntries', null, 'Kevin van Zonneveld');
-        $this->EventCacheInst->ulistAdd('EventCacheLogEntries', null, 'Kevin');
+        $this->EventCacheInst->ulistSet('EventCacheLogEntries', null, 'Kevin van Zonneveld');
+        $this->EventCacheInst->ulistSet('EventCacheLogEntries', null, 'Kevin');
 
         $ulist = $this->EventCacheInst->read('EventCacheLogEntries');
 
@@ -44,8 +44,8 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         
         $this->EventCacheInst->flush();
 
-        $this->EventCacheInst->ulistAdd('EventCacheLogEntries', 'a', 'Kevin van Zonneveld');
-        $this->EventCacheInst->ulistAdd('EventCacheLogEntries', 'b', 'Kevin');
+        $this->EventCacheInst->ulistSet('EventCacheLogEntries', 'a', 'Kevin van Zonneveld');
+        $this->EventCacheInst->ulistSet('EventCacheLogEntries', 'b', 'Kevin');
 
         $ulist = $this->EventCacheInst->read('EventCacheLogEntries');
 
@@ -55,7 +55,7 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         ), $ulist);
     }
 
-    public function testWrite() {
+    public function testWrite () {
         $this->EventCacheInst->write('name', 'Kevin van Zonneveld', array(
             'Employee::afterSave',
             'Employee::afterDelete',
@@ -63,7 +63,7 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Kevin van Zonneveld', $this->EventCacheInst->read('name'));
     }
 
-    public function testRead() {
+    public function testRead () {
         $this->EventCacheInst->write('name', 'Kevin van Zonneveld', array(
             'Employee::afterSave',
             'Employee::afterDelete',
@@ -72,7 +72,7 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($this->EventCacheInst->read('name1'));
     }
 
-    public function testTrigger() {
+    public function testTrigger () {
         $this->EventCacheInst->write('name', 'Kevin van Zonneveld', array(
             'Employee::afterSave',
             'Employee::afterDelete',
@@ -88,7 +88,7 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Kevin van Zonneveld', $this->EventCacheInst->read('name'));
     }
 
-    public function testRegister() {
+    public function testRegister () {
         $this->EventCacheInst->write('name', 'Kevin van Zonneveld', array(
             'Employee::afterSave',
             'Employee::afterDelete',
@@ -106,7 +106,7 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(false, $this->EventCacheInst->read('name'));
     }
 
-    public function testUnregister() {
+    public function testUnregister () {
         $this->EventCacheInst->flush();
         $this->EventCacheInst->write('name', 'Kevin van Zonneveld', array(
             'Employee::afterSave',
@@ -129,7 +129,7 @@ class EventCacheInstTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($keys) === 1);
     }
 
-    public function testGetEvents() {
+    public function testGetEvents () {
         $this->EventCacheInst->write('name', 'Kevin van Zonneveld', array(
             'Employee::afterSave',
             'Employee::afterDelete',

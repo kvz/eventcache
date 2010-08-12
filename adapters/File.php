@@ -12,14 +12,12 @@ class EventCacheAdapterFile extends EventCacheAdapter {
         return true;
 	}
 
+
 	public function get ($key) {
 		return $this->_read($key);
 	}
 	public function set ($key, $val, $ttl = 0, $flag = 0) {
 		return $this->_write($key, $val);
-	}
-	public function add ($key, $val, $ttl = 0) {
-        return $this->_write($key, $val);
 	}
 	public function delete ($key) {
 		return $this->_delete($key);

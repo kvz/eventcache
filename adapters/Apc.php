@@ -17,9 +17,6 @@ class EventCacheAdapterApc extends EventCacheAdapter {
 	public function set ($key, $val, $ttl = 0) {
 		return @apc_store($key, $val, $ttl);
 	}
-	public function add ($key, $val, $ttl = 0) {
-		return @apc_store($key, $val, $ttl);
-	}
 	public function delete ($key) {
 		return @apc_delete($key);
 	}

@@ -175,7 +175,7 @@ class EventCacheInst {
      * 
      * @return <type>
      */
-    public function ulistAdd ($ulistKey, $key = null, $val = null, $ttl = 0) {
+    public function ulistSet ($ulistKey, $key = null, $val = null, $ttl = 0) {
         $safeUlistKey = $this->safeKey('key', $ulistKey);
         $this->debug('Add item: %s with value: %s to ulist: %s. ttl: %s',
             $key,
@@ -183,7 +183,7 @@ class EventCacheInst {
             $safeUlistKey,
             $ttl
         );
-        return $this->_ulistAdd($safeUlistKey, $key, $val, $ttl);
+        return $this->_ulistSet($safeUlistKey, $key, $val, $ttl);
     }
     /**
      * Delete a key
@@ -231,10 +231,10 @@ class EventCacheInst {
         $events = (array)$events;
         $safeTrackKey  = $this->safeKey('events', 'track');
         foreach ($events as $eKey => $event) {
-            $saveKeys = $this->getEventKeys($event);
+            $safeKeys = $this->getEventKeys($event);
 
             // Delete Event's keys
-            $this->_del($saveKeys);
+            $this->_del($safeKeys);
 
             // Delete Event
             $this->_del($eKey);
@@ -285,7 +285,7 @@ class EventCacheInst {
                 if ($del) {
                     $this->_ulistDel($safeTrackKey, $safeEventKey);
                 } else {
-                    $this->_ulistAdd($safeTrackKey, $safeEventKey, $event);
+                    $this->_ulistSet($safeTrackKey, $safeEventKey, $event);
                 }
             }
         }
@@ -296,7 +296,7 @@ class EventCacheInst {
             if ($del) {
                 $this->_ulistDel($safeEventKey, $safeItemKey);
             } else {
-                $this->_ulistAdd($safeEventKey, $safeItemKey, $key);
+                $this->_ulistSet($safeEventKey, $safeItemKey, $key);
             }
         }
         
@@ -309,8 +309,8 @@ class EventCacheInst {
      * @param <type> $event
      */
     public function trigger ($event) {
-        $saveKeys = $this->getEventKeys($event);
-        return $this->_del($saveKeys);
+        $safeKeys = $this->getEventKeys($event);
+        return $this->_del($safeKeys);
     }
 
     // Get events
@@ -361,12 +361,12 @@ class EventCacheInst {
      */
     public function safeKey ($type, $key) {
         // Local cache for cKeys
-        static $saveKeys;
-        if (isset($saveKeys[$type.','.$key])) {
-            return $saveKeys[$type.','.$key];
+        static $safeKeys;
+        if (isset($safeKeys[$type.','.$key])) {
+            return $safeKeys[$type.','.$key];
         }
 
-        $saveKey = $this->_config['app'] .
+        $safeKey = $this->_config['app'] .
             $this->_config['delimiter'] .
             $type .
             $this->_config['delimiter'] .
@@ -381,12 +381,12 @@ class EventCacheInst {
         // pecl/memcache will handle your keys being too long.  I forget what it
         // does (md5 maybe) but it silently deals with it.
 
-//        if (strlen($saveKey) > 250) {
-//            $saveKey = md5($saveKey);
+//        if (strlen($safeKey) > 250) {
+//            $safeKey = md5($safeKey);
 //        }
 
-        $saveKeys[$type.','.$key] = $saveKey;
-        return $saveKey;
+        $safeKeys[$type.','.$key] = $safeKey;
+        return $safeKey;
     }
     /**
      * Sanitizes a string
@@ -445,7 +445,8 @@ class EventCacheInst {
      */
     public function err ($str) {
         $args = func_get_args();
-        return self::_log(self::LOG_ERR, array_shift($args), $args);
+        self::_log(self::LOG_ERR, array_shift($args), $args);
+        return false;
     }
     /**
      * Real function used by err, debug, etc, wrappers
@@ -481,7 +482,7 @@ class EventCacheInst {
         $log .= vsprintf($str, $args);
 
         if (!empty($this->_config['logInKey'])) {
-            return $this->_ulistAdd(
+            return $this->_ulistSet(
                 $this->safeKey('key', $this->_config['logInKey']),
                 null,
                 $log
@@ -496,7 +497,7 @@ class EventCacheInst {
     public function getLogs () {
         if (!empty($this->_config['logInKey'])) {
             $keys = $this->getKeys($this->_config['logInKey']);
-            foreach ($keys as $saveKey=>$key) {
+            foreach ($keys as $safeKey => $key) {
                 $vals[$key] = $this->read($key);
             }
             return $vals;
@@ -514,85 +515,60 @@ class EventCacheInst {
     }
 
     /**
-     * Add remove element from an array in cache
+     * Deletes item from a unique list (associative array)
      *
      * @param <type> $ulistKey
-     * @param <type> $saveKey
-     * @param <type> $ttl
+     * @param <type> $safeKey
+     *
      * @return <type>
      */
-    protected function _ulistDel ($ulistKey, $saveKey, $ttl = 0) {
-        $ulist = $this->_get($ulistKey);
-        if (is_array($ulist) && array_key_exists($saveKey, $ulist)) {
-            unset($ulist[$saveKey]);
-            return $this->_set($ulistKey, $ulist, $ttl);
-        }
-        // Didn't have to remove non-existing key
-        return null;
+    protected function _ulistDel ($ulistKey, $safeKey) {
+        return $this->Cache->ulistDelete($ulistKey, $safeKey);
     }
 
     /**
-     * Add one element to an array in cache
+     * Adds item to a unique list (associative array)
      *
      * @param <type> $ulistKey
-     * @param <type> $saveKey
+     * @param <type> $safeKey  leave null to add item at the end of numerically indexed array
      * @param <type> $val
      * @param <type> $ttl
-     * @return <type>
+     * 
+     * @return mixed boolean or null
      */
-    protected function _ulistAdd ($ulistKey, $saveKey = null, $val = null, $ttl = 0) {
-        $ulist = $this->_get($ulistKey);
-        if (empty($ulist)) {
-            $ulist = array();
-        }
-        if ($saveKey === null) {
-            $ulist[] = $val;
-        } else {
-            $ulist[$saveKey] = $val;
-        }
-        return $this->_set($ulistKey, $ulist, $ttl);
+    protected function _ulistSet ($ulistKey, $safeKey = null, $val = null, $ttl = 0) {
+        return $this->Cache->ulistSet($ulistKey, $safeKey, $val, $ttl);
     }
 
-    /**
-     * Add real key
-     *
-     * @param <type> $saveKey
-     * @param <type> $val
-     * @param <type> $ttl
-     * @return <type>
-     */
-    protected function _add ($saveKey, $val, $ttl = 0) {
-        return $this->Cache->add($saveKey, $val, $ttl);
-    }
     /**
      * Delete real key
      *
-     * @param <type> $saveKeys
+     * @param <type> $safeKeys
      * @param <type> $ttl
      *
      * @return <type>
      */
-    protected function _del ($saveKeys) {
-        if (empty($saveKeys)) {
+    protected function _del ($safeKeys) {
+        if (empty($safeKeys)) {
             return null;
         }
-        if (is_array($saveKeys)) {
+        if (is_array($safeKeys)) {
             $errors = array();
-            foreach($saveKeys as $saveKey) {
-                if (!$this->_del($saveKey)) {
-                    $errors[] = $saveKey;
+            foreach($safeKeys as $safeKey) {
+                if (!$this->_del($safeKey)) {
+                    $errors[] = $safeKey;
                 }
             }
 
-            if (count($errors) === count($saveKeys)) {
+            if (count($errors) === count($safeKeys)) {
                 return false;
             }
 
-            return count($saveKeys) - count($errors);
+            return count($safeKeys) - count($errors);
         }
 
-        unset($this->_localCache[$saveKeys]);
-        if (!$this->Cache->delete($saveKeys)) {
+        unset($this->_localCache[$safeKeys]);
+        if (!$this->Cache->delete($safeKeys)) {
             return false;
         }
 
@@ -601,33 +577,33 @@ class EventCacheInst {
     /**
      * Set real key
      *
-     * @param <type> $saveKey
+     * @param <type> $safeKey
      * @param <type> $val
      * @param <type> $ttl
      * @return <type>
      */
-    protected function _set ($saveKey, $val, $ttl = 0) {
+    protected function _set ($safeKey, $val, $ttl = 0) {
         // Set local cache
-        if (@$this->_localCache[$saveKey] === $val) {
+        if (@$this->_localCache[$safeKey] === $val) {
             return null;
         }
-        $this->_localCache[$saveKey] = $val;
+        $this->_localCache[$safeKey] = $val;
 
-        return $this->Cache->set($saveKey, $val, $ttl);
+        return $this->Cache->set($safeKey, $val, $ttl);
     }
     /**
      * Get real key
      *
-     * @param <type> $saveKey
+     * @param <type> $safeKey
      * @return <type>
      */
-    protected function _get ($saveKey) {
+    protected function _get ($safeKey) {
         // Try local cache first
-        if (isset($this->_localCache[$saveKey])) {
-            return $this->_localCache[$saveKey];
+        if (isset($this->_localCache[$safeKey])) {
+            return $this->_localCache[$safeKey];
         }
         
-        return $this->Cache->get($saveKey);
+        return $this->Cache->get($safeKey);
     }
     /**
      * Flush!
