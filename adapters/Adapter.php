@@ -3,12 +3,16 @@ class EventCacheAdapter {
 	protected $_config = array(
 	);
 
+    protected $_flushSafe = true;
 
 	public function __construct ($options) {
 		$this->_config = array_merge($this->_config, $options);
 	}
     public function init () {
         return true;
+	}
+    public function isFlushSafe () {
+        return $this->_flushSafe;
 	}
 
 
@@ -27,13 +31,13 @@ class EventCacheAdapter {
 
     
 	public function increment ($key, $value = 1) {
-        trigger_error(sprintf('%s::%s needs to be implemented', __CLASS__, __FUNCTION__), E_USER_ERROR);
+        $this->set($key, (float)$this->get($key) + $value);
 	}
 	public function decrement ($key, $value = 1) {
-		trigger_error(sprintf('%s::%s needs to be implemented', __CLASS__, __FUNCTION__), E_USER_ERROR);
+		$this->set($key, (float)$this->get($key) - $value);
 	}
 
-
+    
     /**
      * Add remove element from an array in cache
      *
@@ -43,11 +47,11 @@ class EventCacheAdapter {
      *
      * @return <type>
      */
-    public function ulistDelete ($ulistKey, $safeKey, $ttl = 0) {
+    public function ulistDelete ($ulistKey, $safeKey) {
         $ulist = $this->get($ulistKey);
         if (is_array($ulist) && array_key_exists($safeKey, $ulist)) {
             unset($ulist[$safeKey]);
-            return $this->set($ulistKey, $ulist, $ttl);
+            return $this->set($ulistKey, $ulist);
         }
         // Didn't have to remove non-existing key
         return null;
@@ -63,7 +67,7 @@ class EventCacheAdapter {
      *
      * @return mixed boolean or null
      */
-    public function ulistSet ($ulistKey, $safeKey = null, $val = null, $ttl = 0) {
+    public function ulistSet ($ulistKey, $safeKey = null, $val = null) {
         $ulist = $this->get($ulistKey);
         if (empty($ulist)) {
             $ulist = array();
@@ -73,6 +77,25 @@ class EventCacheAdapter {
         } else {
             $ulist[$safeKey] = $val;
         }
-        return $this->set($ulistKey, $ulist, $ttl);
+        return $this->set($ulistKey, $ulist);
+    }
+    
+    public function getUlist ($ulistKey) {
+        return $this->get($ulistKey);
+    }
+
+    public function listAdd ($listKey, $val = null) {
+        $list = $this->get($listKey);
+        if (empty($list)) {
+            $list = array();
+        }
+        $list[] = $val;
+
+        $this->set($listKey, $list);
+
+        return $this->set($listKey, $list);
+    }
+    public function getList ($listKey) {
+        return $this->get($listKey);
     }
 }

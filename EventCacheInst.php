@@ -58,6 +58,7 @@ class EventCacheInst {
         require_once dirname(__FILE__) . '/adapters/'. 'Apc.php';
         require_once dirname(__FILE__) . '/adapters/'. 'File.php';
         require_once dirname(__FILE__) . '/adapters/'. 'Memcached.php';
+        require_once dirname(__FILE__) . '/adapters/'. 'Redis.php';
 
         $this->_config = array_merge($this->_config, $config);
 
@@ -96,7 +97,7 @@ class EventCacheInst {
 
         if (true !== ($res = $this->Cache->init())) {
             trigger_error(sprintf(
-                'Unable to use the %s adapter because: ',
+                'Unable to use the %s adapter because: %s',
                 $adapter,
                 $res
             ), E_USER_ERROR);
@@ -130,7 +131,10 @@ class EventCacheInst {
 
             // Mother events are attached to all keys
             if (!empty($this->_config['motherEvents'])) {
-                $events = array_merge($events, (array)$this->_config['motherEvents']);
+                $events = array_merge(
+                    $events,
+                    (array)$this->_config['motherEvents']
+                );
             }
 
             $this->register($key, $events);
@@ -185,6 +189,21 @@ class EventCacheInst {
         );
         return $this->_ulistSet($safeUlistKey, $key, $val, $ttl);
     }
+
+    public function getUlist ($ulistKey) {
+        $safeUlistKey = $this->safeKey('key', $ulistKey);
+        return $this->_getUlist($safeUlistKey);
+    }
+    
+    public function getList ($listKey) {
+        $safeUlistKey = $this->safeKey('key', $listKey);
+        return $this->_getList($safeUlistKey);
+    }
+    public function listAdd ($listKey, $item) {
+        $safeListKey = $this->safeKey('key', $listKey);
+        return $this->_listAdd($safeListKey, $item);
+    }
+    
     /**
      * Delete a key
      *
@@ -221,7 +240,7 @@ class EventCacheInst {
         }
 
         if ($events === null) {
-            $events = $this->getEvents();
+            $events = $this->getTracksEvents();
             if (!empty($events)) {
                return $this->clear($events);
             }
@@ -231,7 +250,7 @@ class EventCacheInst {
         $events = (array)$events;
         $safeTrackKey  = $this->safeKey('events', 'track');
         foreach ($events as $eKey => $event) {
-            $safeKeys = $this->getEventKeys($event);
+            $safeKeys = $this->_getEventsInternalKeys($event);
 
             // Delete Event's keys
             $this->_del($safeKeys);
@@ -250,7 +269,10 @@ class EventCacheInst {
      * @return <type>
      */
     public function flush () {
-        return $this->_flush();
+        if ($this->Cache->isFlushSafe()) {
+            return $this->_flush();
+        }
+        return null;
     }
 
     /**
@@ -309,19 +331,22 @@ class EventCacheInst {
      * @param <type> $event
      */
     public function trigger ($event) {
-        $safeKeys = $this->getEventKeys($event);
+        $safeKeys = $this->_getEventsInternalKeys($event);
         return $this->_del($safeKeys);
     }
 
-    // Get events
-    public function getEvents () {
+    public function getAdapter () {
+        return get_class($this->Cache);
+    }
+
+    public function getTracksEvents () {
         if (!$this->_config['trackEvents']) {
             $this->err('You need to enable the slow "trackEvents" option for this');
             return false;
         }
 
         $safeTrackKey = $this->safeKey('events', 'track');
-        $events       = $this->_get($safeTrackKey);
+        $events       = $this->_getUlist($safeTrackKey);
         return $events ? $events : array();
     }
 
@@ -331,9 +356,9 @@ class EventCacheInst {
      * @param <type> $event
      * @return <type>
      */
-    public function getKeys ($event) {
+    public function getEventsKeys ($event) {
         $safeEventKey = $this->safeKey('event', $event);
-        $keys         = $this->_get($safeEventKey);
+        $keys         = $this->_getUlist($safeEventKey);
         return $keys ? $keys : array();
     }
 
@@ -343,8 +368,8 @@ class EventCacheInst {
      * @param <type> $event
      * @return <type>
      */
-    public function getEventKeys ($event) {
-        $ulist = $this->getKeys($event);
+    protected function _getEventsInternalKeys ($event) {
+        $ulist = $this->getEventsKeys($event);
         if (!is_array($ulist)) {
             return $ulist;
         }
@@ -482,11 +507,7 @@ class EventCacheInst {
         $log .= vsprintf($str, $args);
 
         if (!empty($this->_config['logInKey'])) {
-            return $this->_ulistSet(
-                $this->safeKey('key', $this->_config['logInKey']),
-                null,
-                $log
-            );
+            return $this->listAdd($this->_config['logInKey'], $log);
         } elseif (!empty($this->_config['logOnScreen'])) {
             return $this->out($log);
         } elseif (!empty($this->_config['logInVar'])) {
@@ -496,11 +517,7 @@ class EventCacheInst {
 
     public function getLogs () {
         if (!empty($this->_config['logInKey'])) {
-            $keys = $this->getKeys($this->_config['logInKey']);
-            foreach ($keys as $safeKey => $key) {
-                $vals[$key] = $this->read($key);
-            }
-            return $vals;
+            $logs = $this->getList($this->_config['logInKey']);
         } elseif (!empty($this->_config['logOnScreen'])) {
             // Need to read on screen
             return array('You need to read on screen');
@@ -538,6 +555,27 @@ class EventCacheInst {
      */
     protected function _ulistSet ($ulistKey, $safeKey = null, $val = null, $ttl = 0) {
         return $this->Cache->ulistSet($ulistKey, $safeKey, $val, $ttl);
+    }
+
+    /**
+     * Retries entire unique list (associative array)
+     *
+     * @param <type> $ulistKey
+     * @param <type> $safeKey  leave null to add item at the end of numerically indexed array
+     * @param <type> $val
+     * @param <type> $ttl
+     *
+     * @return mixed boolean or null
+     */
+    protected function _getUlist ($ulistKey) {
+        return $this->Cache->getUlist($ulistKey);
+    }
+
+    protected function _listAdd ($listKey, $val = null) {
+        return $this->Cache->listAdd($listKey, $val);
+    }
+    protected function _getList ($listKey) {
+        return $this->Cache->getList($listKey);
     }
 
     /**

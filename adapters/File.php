@@ -27,20 +27,6 @@ class EventCacheAdapterFile extends EventCacheAdapter {
 	}
 
 
-	public function increment ($key, $value = 1) {
-        if (is_numeric(($val = $this->_read($value)))) {
-            $value = $val++;
-        }
-        return $this->_write($key, $value);
-	}
-	public function decrement ($key, $value = 1) {
-        if (is_numeric(($val = $this->_read($value)))) {
-            $value = $val--;
-        }
-        return $this->_write($key, $value);
-	}
-
-
     protected function _read ($key) {
         $path = $this->_keypath($key);
 

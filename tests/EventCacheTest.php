@@ -10,7 +10,7 @@ class EventCacheTest extends PHPUnit_Framework_TestCase {
      *
      * @access protected
      */
-    protected function setUp()
+    protected function setUp ()
     {
         $arr = array(
             'app' => 'testapp',
@@ -21,12 +21,12 @@ class EventCacheTest extends PHPUnit_Framework_TestCase {
         EventCache::flush();
     }
     
-    public function testRead() {
+    public function testRead () {
         EventCache::write('name', 'Kevin');
         $val = EventCache::read('name');
         $this->assertEquals('Kevin', $val);
     }
-    public function testSquashArrayTo1Dim() {
+    public function testSquashArrayTo1Dim () {
         $y = array(
             'a' => array(1, 2, 3, 4),
             'b' => array(5, 6, 7, 8),
@@ -39,7 +39,7 @@ class EventCacheTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($x) === 3);
     }
 
-    public function testLightning() {
+    public function testLightning () {
         $args = array(
             5,
             'Customer',
@@ -52,7 +52,7 @@ class EventCacheTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($keys) === 0);
     }
     
-    public function testMagic() {
+    public function testMagic () {
         $EventCacheInst = EventCache::getInstance();
         $EventCacheInst->flush();
         $this->DBCalled = false;
@@ -108,7 +108,7 @@ class EventCacheTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Kevin', EventCache::read($this->MagicKey));
     }
     
-    public function heavyDBFunction($name, $retry = 3) {
+    public function heavyDBFunction ($name, $retry = 3) {
         $this->DBCalled = false;
         $args = func_get_args();
 
@@ -122,12 +122,12 @@ class EventCacheTest extends PHPUnit_Framework_TestCase {
 
         return $val;
     }
-    public function _heavyDBFunction($name, $retry = 3) {
+    public function _heavyDBFunction ($name, $retry = 3) {
         $this->DBCalled = true;
         return $name;
     }
     
-    public function urlMappingFunction($name, $retry = 3) {
+    public function urlMappingFunction ($name, $retry = 3) {
         $this->DBCalled = false;
         $args = func_get_args();
 
@@ -141,7 +141,7 @@ class EventCacheTest extends PHPUnit_Framework_TestCase {
 
         return $val;
     }
-    public function _urlMappingFunction($name, $retry = 3) {
+    public function _urlMappingFunction ($name, $retry = 3) {
         $this->DBCalled = true;
         return $name;
     }

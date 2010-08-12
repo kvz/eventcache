@@ -30,13 +30,17 @@ class EventCache {
         $_this = EventCache::getInstance();
         return $_this->read($key);
     }
-    static public function getKeys($event) {
+    static public function getKeys ($event) {
         $_this = EventCache::getInstance();
         return $_this->getKeys($event);
     }
-    static public function getEvents() {
+    static public function getEvents () {
         $_this = EventCache::getInstance();
         return $_this->getEvents();
+    }
+    static public function getAdapter () {
+        $_this = EventCache::getInstance();
+        return $_this->getAdapter();
     }
 
     /*
@@ -52,7 +56,7 @@ class EventCache {
     }
     */
 
-    static public function squashArrayTo1Dim($array) {
+    static public function squashArrayTo1Dim ($array) {
         foreach($array as $k=>$v) {
             if (is_array($v)) {
                 $array[$k] = crc32(json_encode($v));
@@ -61,7 +65,7 @@ class EventCache {
         return $array;
     }
 
-    static public function magicKey($scope, $method, $args = array(), $events = array(), $options = array()) {
+    static public function magicKey ($scope, $method, $args = array(), $events = array(), $options = array()) {
         $_this = EventCache::getInstance();
         $dlm   = '.';
         $dls   = '@';

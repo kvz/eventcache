@@ -3,6 +3,12 @@ require_once dirname(__FILE__) . '/Adapter.php';
 class EventCacheAdapterMemcached extends EventCacheAdapter {
 	protected $Memcache;
 
+    protected $_config = array(
+        'servers' => array(
+            '127.0.0.1',
+        ),
+    );
+
 	public function init () {
         if (!class_exists('Memcache')) {
             return sprintf(
