@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 function prd ($arr) {
     echo "<xmp>";
     if (is_array($arr) && count($arr)) {
@@ -16,23 +17,29 @@ require_once dirname(dirname(__FILE__)).'/EventCacheInst.php';
 
 $E = new EventCacheInst(array(
     'app' => 'testapp',
-    'trackEvents' => true,
+    'trackEvents' => false,
     //'adapter' => 'EventCacheAdapterFile',
     'adapter' => 'EventCacheAdapterApc',
     //'adapter' => 'EventCacheAdapterMemcached',
     //'adapter' => 'EventCacheAdapterRedis',
 ));
 
-$E->clear();
-$E->delete('lijst');
-$E->listAdd('lijst', 'kevin');
-$E->listAdd('lijst', 'jp');
-prd($E->getList('lijst'));
+#$E->flush();
+
+#$E->delete('test');
+#$E->write('test', array('kevin'));
+#prd($E->read('test'));
+
+//$E->delete('lijst');
+//$E->listAdd('lijst', 'kevin');
+//$E->listAdd('lijst', 'jp');
+//$lijst = $E->getList('lijst');
+//prd(compact('lijst'));
 
 
-$E->ulistSet('lijst', 'naam1', 'kevin');
-$E->ulistSet('lijst', 'naam2', 'jp');
-$E->ulistSet('lijst', 'num1', 123);
-$E->ulistSet('lijst', 'num2', 234);
-
-prd($E->getUlist('lijst'));
+$E->ulistSet('ulijst', 'naam1', 'kevin');
+$E->ulistSet('ulijst', 'naam2', 'jp');
+$E->ulistSet('ulijst', 'num1', 123);
+$E->ulistSet('ulijst', 'num2', 234);
+$ulijst = $E->getUlist('ulijst');
+prd(compact('ulijst'));

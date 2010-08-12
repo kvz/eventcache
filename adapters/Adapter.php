@@ -31,10 +31,16 @@ class EventCacheAdapter {
 
     
 	public function increment ($key, $value = 1) {
-        $this->set($key, (float)$this->get($key) + $value);
+        if ($this->set($key, ($new = (float)$this->get($key) + $value))) {
+            return $new;
+        }
+        return false;
 	}
 	public function decrement ($key, $value = 1) {
-		$this->set($key, (float)$this->get($key) - $value);
+		if ($this->set($key, ($new = (float)$this->get($key) - $value))) {
+            return $new;
+        }
+        return false;
 	}
 
     
@@ -67,16 +73,14 @@ class EventCacheAdapter {
      *
      * @return mixed boolean or null
      */
-    public function ulistSet ($ulistKey, $safeKey = null, $val = null) {
+    public function ulistSet ($ulistKey, $safeKey, $val) {
         $ulist = $this->get($ulistKey);
         if (empty($ulist)) {
             $ulist = array();
         }
-        if ($safeKey === null) {
-            $ulist[] = $val;
-        } else {
-            $ulist[$safeKey] = $val;
-        }
+
+        $ulist[$safeKey] = $val;
+        
         return $this->set($ulistKey, $ulist);
     }
     
@@ -90,10 +94,9 @@ class EventCacheAdapter {
             $list = array();
         }
         $list[] = $val;
-
-        $this->set($listKey, $list);
-
-        return $this->set($listKey, $list);
+        $success = $this->set($listKey, $list);
+        prd(compact('val', 'listKey', 'list', 'success'));
+        return $y;
     }
     public function getList ($listKey) {
         return $this->get($listKey);
