@@ -61,7 +61,9 @@ class EventCacheAdapterRedis extends EventCacheAdapter {
 	}
 	public function set ($key, $val, $ttl = 0) {
 		if ($ttl === 0) $ttl = null;
-		$Key = new Rediska_Key($key, $ttl);
+		$Key = new Rediska_Key($key, array(
+            'expire' => $ttl,
+        ));
 		$Key->setRediska($this->Rediska);
 		return $Key->setValue($val);
 	}
