@@ -1,9 +1,14 @@
 Eventcache is a PHP class for caching that:
  - Is very fast
- - Supports multiple backends (memcache, apc, redis, file)
- - Is very easy to implement
+ - Supports multiple backends
+   - memcache
+   - apc (has some bugs)
+   - redis (needs 2.2)
+   - file
+ - Is easy to implement
  - Doesn't care about your framework
  - Tries to solve the invalidation problem by using events & triggers
+ - Can be used as a wrapper around heavy functions
 
 On the  I held a [presentation on Eventcache](http://www.slideshare.net/kevinvz/eventcache)
 during [the 2nd CakePHP borrel](http://www.cake-toppings.com/2010/10/15/venue-of-the-dutch-cakephp-borrel-event-announced/)
