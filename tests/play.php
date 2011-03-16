@@ -1,15 +1,15 @@
 <?php
 error_reporting(E_ALL);
 function prd ($arr) {
-    echo "<xmp>";
-    if (is_array($arr) && count($arr)) {
-        print_r($arr);
-    } else {
-        var_dump($arr);
-    }
-    echo "\n";
-    echo "</xmp>";
-    die();
+	echo "<xmp>";
+	if (is_array($arr) && count($arr)) {
+		print_r($arr);
+	} else {
+		var_dump($arr);
+	}
+	echo "\n";
+	echo "</xmp>";
+	die();
 }
 
 
@@ -30,12 +30,12 @@ require_once dirname(dirname(__FILE__)).'/EventCacheInst.php';
 
 
 $E = new EventCacheInst(array(
-    'app' => 'testapp',
-    'trackEvents' => false,
-    //'adapter' => 'EventCacheAdapterFile',
-    'adapter' => 'EventCacheAdapterApc',
-    //'adapter' => 'EventCacheAdapterMemcached',
-    //'adapter' => 'EventCacheAdapterRedis',
+	'app' => 'testapp',
+	'trackEvents' => false,
+	//'adapter' => 'EventCacheAdapterFile',
+	'adapter' => 'EventCacheAdapterApc',
+	//'adapter' => 'EventCacheAdapterMemcached',
+	//'adapter' => 'EventCacheAdapterRedis',
 ));
 
 #$E->flush();
@@ -43,7 +43,7 @@ $E = new EventCacheInst(array(
 //$E->delete('test');
 //$lijst = $E->read('test');
 //if (empty($lijst)) {
-//    $lijst = array();
+//	$lijst = array();
 //}
 //$lijst[] = 'test';
 //$E->write('test', $lijst);
