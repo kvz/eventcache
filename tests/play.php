@@ -11,6 +11,20 @@ function prd ($arr) {
     echo "</xmp>";
     die();
 }
+
+
+include_once('Rediska/Key/Set.php');
+$key = 'test';
+$Set = new Rediska_Key_Set($key);
+$Set->add('a');
+$Set->add('b');
+$Set->add('b');
+$Set->add('a');
+prd($Set->toArray());
+
+
+die();
+
 require_once dirname(dirname(__FILE__)).'/EventCache.php';
 require_once dirname(dirname(__FILE__)).'/EventCacheInst.php';
 
