@@ -15,7 +15,6 @@ during [the 2nd CakePHP borrel](http://www.cake-toppings.com/2010/10/15/venue-of
 in Utrecht.
 It explains what Eventcache does and how you can implement it.
 
-
 ## Setup
 
     require_once APP . DS . 'vendors' . DS . 'eventcache' . DS . 'EventCache.php';
