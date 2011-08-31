@@ -45,16 +45,16 @@ class EventCacheInst {
 		),
 	);
 
-	protected $_dir		= null;
+	protected $_dir        = null;
 	protected $_localCache = array();
-	public	$Cache	   = null;
+	public $Cache          = null;
 
 	/**
 	 * Init
 	 *
 	 * @param <type> $config
 	 */
-	public function  __construct ($config) {
+	public function __construct ($config) {
 		require_once dirname(__FILE__) . '/adapters/'. 'Apc.php';
 		require_once dirname(__FILE__) . '/adapters/'. 'File.php';
 		require_once dirname(__FILE__) . '/adapters/'. 'Memcached.php';
@@ -248,7 +248,7 @@ class EventCacheInst {
 		}
 
 		$events = (array)$events;
-		$safeTrackKey  = $this->safeKey('events', 'track');
+		$safeTrackKey = $this->safeKey('events', 'track');
 		foreach ($events as $eKey => $event) {
 			$safeKeys = $this->_getEventsInternalKeys($event);
 
@@ -346,7 +346,7 @@ class EventCacheInst {
 		}
 
 		$safeTrackKey = $this->safeKey('events', 'track');
-		$events	   = $this->_getUlist($safeTrackKey);
+		$events       = $this->_getUlist($safeTrackKey);
 		return $events ? $events : array();
 	}
 
@@ -358,7 +358,7 @@ class EventCacheInst {
 	 */
 	public function getEventsKeys ($event) {
 		$safeEventKey = $this->safeKey('event', $event);
-		$keys		 = $this->_getUlist($safeEventKey);
+		$keys         = $this->_getUlist($safeEventKey);
 		return $keys ? $keys : array();
 	}
 
