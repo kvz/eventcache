@@ -114,10 +114,10 @@ class EventCache {
 		if (empty($events)) $events = array();
 		if (empty($options)) $options = array();
 
-		$key	  = self::magicKey($scope, $method, $args, $events, $options);
+		$key      = self::magicKey($scope, $method, $args, $events, $options);
 		$callback = array($scope, '_'.$method);
-		#$debug	= $method === '_getLookupList';
-		$debug	= false;
+		#$debug    = $method === '_getLookupList';
+		$debug    = false;
 
 		if (!empty($options['disable'])) {
 			$val = self::_execute($callback, $args);
