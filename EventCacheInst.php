@@ -460,7 +460,7 @@ class EventCacheInst {
 	 */
 	public function debug ($str) {
 		$args = func_get_args();
-		return self::_log(self::LOG_DEBUG, array_shift($args), $args);
+		return $this->_log(self::LOG_DEBUG, array_shift($args), $args);
 	}
 	/**
 	 * Log error messages
@@ -470,7 +470,7 @@ class EventCacheInst {
 	 */
 	public function err ($str) {
 		$args = func_get_args();
-		self::_log(self::LOG_ERR, array_shift($args), $args);
+		$this->_log(self::LOG_ERR, array_shift($args), $args);
 		return false;
 	}
 	/**
