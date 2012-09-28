@@ -20,7 +20,7 @@ class EventCacheAdapterApc extends EventCacheAdapter {
 	public function get ($key) {
 		return apc_fetch($key);
 	}
-	public function set ($key, $val, $ttl = 999) {
+	public function set ($key, $val, $ttl = 0) {
 		return apc_store($key, $val, $ttl);
 
 //		if (($got = apc_fetch($key)) !== $val) {
