@@ -391,7 +391,13 @@ class EventCacheInst {
 			return $safeKeys[$type.','.$key];
 		}
 
-		$safeKey = $this->_config['app'] .
+		// Use the trackEvents as namespace in case more than one application wants to share the same events
+		// So each app can still have their own keys, however all the events will be tracked on a global namespace
+		$namespace = (in_array($type, array('events', 'event')) && !empty($this->_config['trackEvents']) && is_string($this->_config['trackEvents']))
+			? $this->_config['trackEvents']
+			: $this->_config['app'];
+
+		$safeKey = $namespace .
 			$this->_config['delimiter'] .
 			$type .
 			$this->_config['delimiter'] .
