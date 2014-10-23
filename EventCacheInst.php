@@ -57,6 +57,7 @@ class EventCacheInst {
 	public function __construct ($config) {
 		require_once dirname(__FILE__) . '/adapters/'. 'Apc.php';
 		require_once dirname(__FILE__) . '/adapters/'. 'File.php';
+		require_once dirname(__FILE__) . '/adapters/'. 'Memcache.php';
 		require_once dirname(__FILE__) . '/adapters/'. 'Memcached.php';
 		require_once dirname(__FILE__) . '/adapters/'. 'Redis.php';
 

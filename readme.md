@@ -2,6 +2,7 @@ Eventcache is a PHP class for caching that:
  - Is very fast
  - Supports multiple backends
    - memcache
+   - memcached
    - apc (has some bugs)
    - redis (needs 2.2)
    - file

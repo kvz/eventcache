@@ -1,48 +1,46 @@
 <?php
 require_once dirname(__FILE__) . '/Adapter.php';
 class EventCacheAdapterMemcached extends EventCacheAdapter {
-	protected $Memcache;
+	protected $Memcached;
 
 	protected $_config = array(
 		'servers' => array(
-			'127.0.0.1',
+			array('127.0.0.1', 11211),
 		),
 	);
 
 	public function init () {
-		if (!class_exists('Memcache')) {
+		if (!class_exists('Memcached')) {
 			return sprintf(
-				'Memcache not installed'
+				'Memcached not installed'
 			);
 		}
 
-		$this->Memcache = new Memcache();
-		foreach ($this->_config['servers'] as $server) {
-			call_user_func(array($this->Memcache, 'addServer'), $server);
-		}
+		$this->Memcached = new Memcached();
+		$this->Memcached->addServers($this->_config['servers']);
 
 		return true;
 	}
 
 
 	public function get ($key) {
-		return @$this->Memcache->get($key);
+		return @$this->Memcached->get($key);
 	}
-	public function set ($key, $val, $ttl = 0, $flag = 0) {
-		return @$this->Memcache->set($key, $val, $flag, $ttl);
+	public function set ($key, $val, $ttl = 0) {
+		return @$this->Memcached->set($key, $val, $ttl);
 	}
 	public function delete ($key) {
-		return @$this->Memcache->delete($key, $ttl);
+		return @$this->Memcached->delete($key, $ttl);
 	}
 	public function flush () {
-		return $this->Memcache->flush();
+		return $this->Memcached->flush();
 	}
 
 
 	public function increment ($key, $val = 1) {
-		return @$this->Memcache->increment($key, $val);
+		return @$this->Memcached->increment($key, $val);
 	}
 	public function decrement ($key, $val = 1) {
-		return @$this->Memcache->decrement($key, $val);
+		return @$this->Memcached->decrement($key, $val);
 	}
 }
