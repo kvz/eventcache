@@ -36,7 +36,7 @@ class EventCacheInst {
 		'logMicroseconds' => false,
 		'logOnScreen' => false,
 		'ttl' => 0,
-		'flag' => MEMCACHE_COMPRESSED,
+		'flag' => 0,
 		'trackEvents' => false,
 		'motherEvents' => array(),
 		'disable' => false,
